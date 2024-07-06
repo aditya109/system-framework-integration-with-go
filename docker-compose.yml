@@ -23,12 +23,14 @@ services:
       - postgres-data:/var/lib/postgresql/data
   redis:
     image: "redis:alpine"
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -38,6 +40,7 @@ services:
       - zookeeper-data:/var/lib/zookeeper
   kafka:
     image: confluentinc/cp-kafka:latest
+    container_name: kafka
     depends_on:
       - zookeeper
     environment:
@@ -51,6 +54,7 @@ services:
       - kafka-data:/var/lib/kafka
   mongo:
     image: mongo:latest
+    container_name: mongo
     ports:
       - "27017:27017"
     environment:
@@ -58,26 +62,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - mongo-data:/data/db
-
-  vault:
-    image: hashicorp/vault:latest
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: testtoken
-    ports:
-      - 8200:8200
-    privileged: true
-  vault-tls:
-    image: hashicorp/vault:latest
-    hostname: vault-tls
-    environment:
-      VAULT_CAPATH: /etc/vault/ca.crt
-    ports:
-      - 8200:8200
-    privileged: true
-    volumes:
-      - ${PWD}/integrationTests/e2e-tls/configs:/etc/vault
-      - vault-data:/var/lib/vault:rw
-    entrypoint: vault server -config=/etc/vault/config.hcl
 
 
 
